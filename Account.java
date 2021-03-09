@@ -1,5 +1,10 @@
 package lunvik8;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Account class that defines the properties of an Account. Part of D0018D,
  * assignment 2.
@@ -15,12 +20,16 @@ public abstract class Account
 	 * the customer.
 	 */
 	private static int nextAccountId = 1000;
+	
+	
+	// transaktioner
+	protected List<String> transactionsList = new ArrayList<>();
 
 	/**
 	 * Instance variables
 	 */
 	private int accountId;
-	protected double balance;
+	private double balance;
 	private String type;
 
 	/**
@@ -34,20 +43,52 @@ public abstract class Account
 		this.type = type;
 	}
 
+
+
+	/**
+	 * Abstract method withdrawal to be defined in CreditAccount and SavingsAccount
+	 * 
+	 * @param amount to withdrawal as double
+	 * @return true if successful, false if failed
+	 */
+	abstract boolean withdrawal(double amount);
 	
-	//Deposit
+	
+	/**
+	 * Calculates the interest of the account
+	 * 
+	 * @return the interest
+	 */
+	abstract double calculateInterest();
+	
+	
+	/**
+	 * Deposit into account
+	 * 
+	 * @param amount to deposit as double
+	 */
 	public void deposit(double amount)
 	{
 		balance += amount;
+		
+		LocalDateTime currentTime = LocalDateTime.now();
+		DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String formatedTime = currentTime.format(prefFormat);
+		transactionsList.add(formatedTime + " " + amount + " kr " + "Saldo: " + getBalance() + " kr");
+		
+		
+		
 	}
 	
 	
-	//Withdrawal ABSTRACT
-	abstract void withdrawal(double amount);
-	
-
-	
-	
+	// BEHÖVER JAG DENNA ELLER GÅR DET LÖSA PÅ NÅTT ANNAT SÄTT
+	/**
+	 * @param balance the balance to set
+	 */
+	public void setBalance(double balance)
+	{
+		this.balance = balance;
+	}
 
 	/**
 	 * getAccountId
@@ -62,29 +103,39 @@ public abstract class Account
 	/**
 	 * Check balance
 	 * 
-	 * @param accountId for the account we want to check
 	 * @return the balance
 	 */
-	public double getBalance(int accountId)
+	public double getBalance()
 	{
 		return balance;
 	}
 
+	/**
+	 * Getter for type of account
+	 * 
+	 * @return the account type as String. "Sparkonto" or "Kreditkonto"
+	 */
+	public String getType()
+	{
+		return type;
+	}
 
-	
+	/**
+	 * Abstract toString representation of the account including rate as %.
+	 * 
+	 * @return accountId + balance + type + rate
+	 */
+	abstract String toStringWithRate();
+
 	/**
 	 * A toString representation of the account without rate.
 	 * 
 	 * @return accountId + balance + type
 	 */
-	@Override
-	public String toString()
+	public String toStringWithoutRate()
 	{
-		return (accountId + " " + balance + " kr " + type + " ");
+		return (accountId + " " + balance + " kr " + getType() + " ");
 	}
-
-
-
 
 
 

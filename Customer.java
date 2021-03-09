@@ -17,8 +17,7 @@ public class Customer
 	 * List of accounts that holds Customer objects own personal accounts. Accounts
 	 * are created through createSavingsAccount method in BankLogic.java
 	 */
-	List<CreditAccount> creditAccountList = new ArrayList<>();
-	List<SavingsAccount> savingsAccountList = new ArrayList<>();
+	private List<Account> accountsList = new ArrayList<>();
 
 	/**
 	 * Instance variables
@@ -90,6 +89,16 @@ public class Customer
 	{
 		return pNo;
 	}
+	
+	/**
+	 * Method is used to get the list of Accounts
+	 * 
+	 * @return the ArrayList with Accounts
+	 */
+	public List<Account> getAccountsList()
+	{
+		return accountsList;
+	}
 
 	/**
 	 * A toString representation of the customer
@@ -100,5 +109,7 @@ public class Customer
 	{
 		return (pNo + " " + name + " " + surname);
 	}
+
+
 
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class BankLogic
 {
-
+	// TODO: skapa ett UML diagram för projektet
 	/**
 	 * ArrayList of type Customer to keep track of customers. Customers are created
 	 * through createCustomer method and stored here.
@@ -114,17 +114,10 @@ public class BankLogic
 			tmpCustomerArr.add(tmpCustomer.toStringCustomer());
 			// Continue with information about the accounts on following slots.
 			// We must loop through the account list to fetch information about each slot
-			// Start with savings accounts
-			for (int i = 0; i < tmpCustomer.savingsAccountList.size(); i++)
+			for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
 			{
 				// Add to the list.
-				tmpCustomerArr.add(tmpCustomer.savingsAccountList.get(i).toString());
-			}
-			// Then do credit accounts
-			for (int i = 0; i < tmpCustomer.creditAccountList.size(); i++)
-			{
-				// Add to the list
-				tmpCustomerArr.add(tmpCustomer.creditAccountList.get(i).toString());
+				tmpCustomerArr.add(tmpCustomer.getAccountsList().get(i).toStringWithRate());
 			}
 			// Return the list.
 			return tmpCustomerArr;
@@ -187,14 +180,33 @@ public class BankLogic
 		if (tmpCustomer != null)
 		{
 			// Create new instance of Account.
-			SavingsAccount tmpAcc = new SavingsAccount();
+			Account tmpAcc = new SavingsAccount();
 			// Add our freshly created account to customers own personal accountsArrayList.
-			tmpCustomer.savingsAccountList.add(tmpAcc);
+			tmpCustomer.getAccountsList().add(tmpAcc);
 			// Get account number for the newly created account and return it.
 			return (tmpAcc.getAccountId());
 		} else
 		{
 			// If we didn't find the customer and no account was created, return -1.
+			return -1;
+		}
+	}
+
+	/**
+	 * @param pNo
+	 * @return
+	 */
+	public int createCreditAccount(String pNo)
+	{
+		Customer tmpCustomer = findCustomer(pNo);
+
+		if (tmpCustomer != null)
+		{
+			Account tmpAcc = new CreditAccount();
+			tmpCustomer.getAccountsList().add(tmpAcc);
+			return (tmpAcc.getAccountId());
+		} else
+		{
 			return -1;
 		}
 	}
@@ -216,26 +228,14 @@ public class BankLogic
 		if (tmpCustomer != null)
 		{
 			// Loop through all accounts in the array associated with the current person.
-			// Start with savings accounts
-			for (int i = 0; i < tmpCustomer.savingsAccountList.size(); i++)
+			for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
 			{
 				// Check whether the current accountId equals the one we are searching for.
-				int currentAccountId = tmpCustomer.savingsAccountList.get(i).getAccountId();
+				int currentAccountId = tmpCustomer.getAccountsList().get(i).getAccountId();
 				if (currentAccountId == accountId)
 				{
 					// If it does, return a toString version of the account.
-					return tmpCustomer.savingsAccountList.get(i).toString();
-				}
-			}
-			// Continune with credit accounts
-			for (int i = 0; i < tmpCustomer.creditAccountList.size(); i++)
-			{
-				// Check whether the current accountId equals the one we are searching for.
-				int currentAccountId = tmpCustomer.creditAccountList.get(i).getAccountId();
-				if (currentAccountId == accountId)
-				{
-					// If it does, return a toString version of the account.
-					return tmpCustomer.creditAccountList.get(i).toString();
+					return tmpCustomer.getAccountsList().get(i).toStringWithRate();
 				}
 			}
 			// If we didn't find the account, return null.
@@ -264,31 +264,16 @@ public class BankLogic
 			// If we did find the customer: do
 			if (tmpCustomer != null)
 			{
-
 				// Loop through all accounts in the array associated with the current person.
-				// Start with savings accounts
-				for (int i = 0; i < tmpCustomer.savingsAccountList.size(); i++)
+				for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
 				{
 					// Check whether the current accountId equals the one we are searching for.
-					int currentAccountId = tmpCustomer.savingsAccountList.get(i).getAccountId();
+					int currentAccountId = tmpCustomer.getAccountsList().get(i).getAccountId();
 					if (currentAccountId == accountId)
 					{
 						// If it does, we found the correct account.
 						// Deposit into the account and return true.
-						tmpCustomer.savingsAccountList.get(i).deposit(amount);
-						return true;
-					}
-				}
-				// Then check the credit accounts
-				for (int i = 0; i < tmpCustomer.creditAccountList.size(); i++)
-				{
-					// Check whether the current accountId equals the one we are searching for.
-					int currentAccountId = tmpCustomer.creditAccountList.get(i).getAccountId();
-					if (currentAccountId == accountId)
-					{
-						// If it does, we found the correct account.
-						// Deposit into the account and return true.
-						tmpCustomer.creditAccountList.get(i).deposit(amount);
+						tmpCustomer.getAccountsList().get(i).deposit(amount);
 						return true;
 					}
 				}
@@ -315,39 +300,20 @@ public class BankLogic
 		if (tmpCustomer != null)
 		{
 			// Loop through all accounts in the array associated with the current person.
-			// Start with the savings account
-			for (int i = 0; i < tmpCustomer.savingsAccountList.size(); i++)
+			for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
 			{
 				// Check whether the current accountId equals the one we are searching for.
-				int currentAccountId = tmpCustomer.savingsAccountList.get(i).getAccountId();
+				int currentAccountId = tmpCustomer.getAccountsList().get(i).getAccountId();
 				if (currentAccountId == accountId)
 				{
 					// If it does, we found the correct account.
-					// Withdrawal from the account. But only if there is enough money & withdrawals
-					// is possible
-					if (tmpCustomer.savingsAccountList.get(i).getBalance(currentAccountId) >= amount && amount >= 0
-							&& tmpCustomer.savingsAccountList.get(i).getAvailableWithdrawals() > 1)
+					// Withdrawal from the account
+					if (tmpCustomer.getAccountsList().get(i).withdrawal(amount))
 					{
-						tmpCustomer.savingsAccountList.get(i).withdrawal(amount);
-						// Withdrawal was successful, return true.
 						return true;
-					}
-				}
-			}
-			// Continue with credit accounts
-			for (int i = 0; i < tmpCustomer.creditAccountList.size(); i++)
-			{
-				// Check whether the current accountId equals the one we are searching for.
-				int currentAccountId = tmpCustomer.creditAccountList.get(i).getAccountId();
-				if (currentAccountId == accountId)
-				{
-					// If it does, we found the correct account.
-					// Withdrawal from the account. But only if there is enough money.
-					if (tmpCustomer.creditAccountList.get(i).getBalance(currentAccountId) >= amount && amount >= 0)
+					} else
 					{
-						tmpCustomer.creditAccountList.get(i).withdrawal(amount);
-						// Withdrawal was successful, return true.
-						return true;
+						return false;
 					}
 				}
 			}
@@ -372,35 +338,18 @@ public class BankLogic
 		if (tmpCustomer != null)
 		{
 			// Loop through all accounts in the array associated with the current person.
-			// Start with savings account
-			for (int i = 0; i < tmpCustomer.savingsAccountList.size(); i++)
+			for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
 			{
 				// Check whether the current accountId equals the one we are searching for.
-				int currentAccountId = tmpCustomer.savingsAccountList.get(i).getAccountId();
+				int currentAccountId = tmpCustomer.getAccountsList().get(i).getAccountId();
 				if (currentAccountId == accountId)
 				{
 					// If it does, we found the correct account.
 					// Add information about the account + the calculated interest as String
-					String s = tmpCustomer.savingsAccountList.get(i).toString()
-							+ tmpCustomer.savingsAccountList.get(i).calculateInterest(accountId) + " kr";
+					String s = tmpCustomer.getAccountsList().get(i).toStringWithoutRate()
+							+ tmpCustomer.getAccountsList().get(i).calculateInterest() + " kr";
 					// Permanently close the account.
-					tmpCustomer.savingsAccountList.remove(i);
-					// Return the String.
-					return (s);
-				}
-			}
-			// Continue with credit accounts
-			for (int i = 0; i < tmpCustomer.creditAccountList.size(); i++)
-			{
-				// Check whether the current accountId equals the one we are searching for.
-				int currentAccountId = tmpCustomer.creditAccountList.get(i).getAccountId();
-				if (currentAccountId == accountId)
-				{
-					// If it does, we found the correct account.
-					// Add information about the account + the calculated interest as String
-					String s = tmpCustomer.creditAccountList.get(i).toString();
-					// Permanently close the account.
-					tmpCustomer.creditAccountList.remove(i);
+					tmpCustomer.getAccountsList().remove(i);
 					// Return the String.
 					return (s);
 				}
@@ -437,22 +386,13 @@ public class BankLogic
 				// Loop through all the accounts.
 				// No incrementer on j since we delete the account each time in the loop,
 				// so index shiftes every time.
-				// Start with savings accounts
-				for (int j = 0; j < tmpCustomer.savingsAccountList.size();)
+				for (int j = 0; j < tmpCustomer.getAccountsList().size();)
 				{
 					// Add information about each account including interest to the list.
-					tmpCustomerArr.add(tmpCustomer.savingsAccountList.get(j).toString() + tmpCustomer.savingsAccountList
-							.get(j).calculateInterest(tmpCustomer.savingsAccountList.get(j).getAccountId()) + " kr");
+					tmpCustomerArr.add(tmpCustomer.getAccountsList().get(j).toStringWithoutRate()
+							+ tmpCustomer.getAccountsList().get(j).calculateInterest() + " kr");
 					// Remove the account.
-					tmpCustomer.savingsAccountList.remove(j);
-				}
-				// Continue with credit accounts
-				for (int j = 0; j < tmpCustomer.creditAccountList.size();)
-				{
-					// Add information about each account including interest to the list.
-					tmpCustomerArr.add(tmpCustomer.creditAccountList.get(j).toString());
-					// Remove the account.
-					tmpCustomer.creditAccountList.remove(j);
+					tmpCustomer.getAccountsList().remove(j);
 				}
 				// Remove the customer.
 				customerList.remove(i);
@@ -464,19 +404,36 @@ public class BankLogic
 		return null;
 	}
 
-	public int createCreditAccount(String pNo)
-	{
-		// TODO: implementera metoden
-		return -1;
-	}
-
 	public ArrayList<String> getTransactions(String pNo, int accountId)
 	{
-		ArrayList<String> tmpList = new ArrayList<>();
-		return tmpList;
+		// TODO: transaktioner finns lagrade i en lista men de måste lagras som
+		// transaktioner för JUSt den customern. eller kanske till och med just det
+		// accountet??
+
+		ArrayList<String> hej = new ArrayList<>();
+		// Find the customer using findCustomer method.
+		Customer tmpCustomer = findCustomer(pNo);
+		// If we did find the customer: do
+		if (tmpCustomer != null)
+		{
+			// Loop through all accounts in the array associated with the current person.
+			for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
+			{
+				// Check whether the current accountId equals the one we are searching for.
+				int currentAccountId = tmpCustomer.getAccountsList().get(i).getAccountId();
+				if (currentAccountId == accountId)
+				{
+					// If it does, we found the correct account.
+					for (int j = 0; j < tmpCustomer.getAccountsList().get(i).transactionsList.size(); j++)
+					{
+						String hejsan = tmpCustomer.getAccountsList().get(i).transactionsList.get(j);
+						hej.add(hejsan);
+					}
+
+				}
+			}
+		}
+		return hej;
 	}
-	
-	
-	
-	
+
 }
