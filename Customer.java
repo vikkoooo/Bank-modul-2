@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Customer class that defines a Customer object. Part of D0018D, assignment 1.
+ * Customer class that defines a Customer object. Part of D0018D, assignment 2.
  * 
  * @author Viktor Lundberg, lunvik-8
- * @version 2.0 (2021-mm-dd)
+ * @version 2.0 (2021-03-09)
  */
 
 public class Customer
 {
-
 	/**
 	 * List of accounts that holds Customer objects own personal accounts. Accounts
 	 * are created through createSavingsAccount method in BankLogic.java
@@ -89,11 +88,11 @@ public class Customer
 	{
 		return pNo;
 	}
-	
+
 	/**
 	 * Method is used to get the list of Accounts
 	 * 
-	 * @return the ArrayList with Accounts
+	 * @return the List with Accounts
 	 */
 	public List<Account> getAccountsList()
 	{
@@ -109,7 +108,5 @@ public class Customer
 	{
 		return (pNo + " " + name + " " + surname);
 	}
-
-
 
 }

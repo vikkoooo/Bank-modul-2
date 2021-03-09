@@ -10,7 +10,7 @@ import java.util.List;
  * assignment 2.
  * 
  * @author Viktor Lundberg, lunvik-8
- * @version 2.0 (2021-mm-dd)
+ * @version 2.0 (2021-03-09)
  */
 
 public abstract class Account
@@ -20,13 +20,14 @@ public abstract class Account
 	 * the customer.
 	 */
 	private static int nextAccountId = 1000;
-	
-	
-	// transaktioner
-	protected List<String> transactionsList = new ArrayList<>();
 
 	/**
-	 * Instance variables
+	 * List to store all transactions for the current account.
+	 */
+	private List<String> transactionsList = new ArrayList<>();
+
+	/**
+	 * Instance variables for all Accounts.
 	 */
 	private int accountId;
 	private double balance;
@@ -34,6 +35,8 @@ public abstract class Account
 
 	/**
 	 * Constructor
+	 * 
+	 * @param type of account to be defined by the underclass.
 	 */
 	public Account(String type)
 	{
@@ -43,25 +46,21 @@ public abstract class Account
 		this.type = type;
 	}
 
-
-
-	/**
-	 * Abstract method withdrawal to be defined in CreditAccount and SavingsAccount
-	 * 
-	 * @param amount to withdrawal as double
-	 * @return true if successful, false if failed
-	 */
-	abstract boolean withdrawal(double amount);
-	
-	
 	/**
 	 * Calculates the interest of the account
 	 * 
 	 * @return the interest
 	 */
 	abstract double calculateInterest();
-	
-	
+
+	/**
+	 * Abstract method withdrawal to be defined in CreditAccount and SavingsAccount
+	 * 
+	 * @param amount to withdrawal
+	 * @return true if successful, false if failed
+	 */
+	abstract boolean withdrawal(double amount);
+
 	/**
 	 * Deposit into account
 	 * 
@@ -69,21 +68,21 @@ public abstract class Account
 	 */
 	public void deposit(double amount)
 	{
+		// Set the new balance
 		balance += amount;
 		
-		LocalDateTime currentTime = LocalDateTime.now();
-		DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String formatedTime = currentTime.format(prefFormat);
-		transactionsList.add(formatedTime + " " + amount + " kr " + "Saldo: " + getBalance() + " kr");
-		
-		
-		
+		//Create timestamp for the transaction
+		LocalDateTime currentTime = LocalDateTime.now(); // Get the current time
+		DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // Define our format
+		String formatedTime = currentTime.format(prefFormat); // Format it
+		getTransactionsList().add(formatedTime + " " + amount + " kr " + "Saldo: " + getBalance() + " kr");
 	}
-	
-	
-	// BEHÖVER JAG DENNA ELLER GÅR DET LÖSA PÅ NÅTT ANNAT SÄTT
+
 	/**
-	 * @param balance the balance to set
+	 * To be able to change the balance we need a setter that the withdrawal methods
+	 * can use.
+	 * 
+	 * @param the new balance
 	 */
 	public void setBalance(double balance)
 	{
@@ -111,7 +110,17 @@ public abstract class Account
 	}
 
 	/**
-	 * Getter for type of account
+	 * Method to get the transaction list
+	 * 
+	 * @return the list of transactions
+	 */
+	public List<String> getTransactionsList()
+	{
+		return transactionsList;
+	}
+
+	/**
+	 * Get type of account
 	 * 
 	 * @return the account type as String. "Sparkonto" or "Kreditkonto"
 	 */
@@ -136,7 +145,5 @@ public abstract class Account
 	{
 		return (accountId + " " + balance + " kr " + getType() + " ");
 	}
-
-
 
 }

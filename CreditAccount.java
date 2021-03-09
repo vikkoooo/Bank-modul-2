@@ -8,17 +8,17 @@ import java.time.format.DateTimeFormatter;
  * Part of D0018D, assignment 2.
  * 
  * @author Viktor Lundberg, lunvik-8
- * @version 2.0 (2021-mm-dd)
+ * @version 2.0 (2021-03-09)
  */
 
 public class CreditAccount extends Account
 {
 	/**
-	 * Instance variables
+	 * Instance variables specific for CreditAccounts
 	 */
-	int creditLimit;
-	double rate;
-	double debtRate;
+	private int creditLimit;
+	private double rate;
+	private double debtRate;
 
 	/**
 	 * Constructor
@@ -32,47 +32,57 @@ public class CreditAccount extends Account
 	}
 
 	/**
-	 * Withdrawal from account
+	 * Withdrawal from account. Withdrawal amount has to be a positive number.
+	 * Cannot exceed credit limit.
 	 * 
-	 * @param amount to withdrawal as double
+	 * @param amount to withdrawal
 	 * @return true if successful, false if failed
 	 */
-	// TODO: withdrawal måste skrivas om
 	public boolean withdrawal(double amount)
 	{
+		// Checks that the withdrawal amount does not exceed the current balance +
+		// credit limit.
 		double currentBalance = getBalance();
 		if (currentBalance + creditLimit >= amount && amount >= 0)
 		{
+			// Set new balance
 			setBalance(currentBalance -= amount);
-			
-			
-			LocalDateTime currentTime = LocalDateTime.now();
-			DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String formatedTime = currentTime.format(prefFormat);
-			transactionsList.add(formatedTime + " -" + amount + " kr " + "Saldo: " + getBalance() + " kr");
-			
+
+			// Create timestamp for the transaction
+			LocalDateTime currentTime = LocalDateTime.now(); // Get the current time
+			DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // Define our format
+			String formatedTime = currentTime.format(prefFormat); // Format it
+			getTransactionsList().add(formatedTime + " -" + amount + " kr " + "Saldo: " + getBalance() + " kr");
+
+			// Successful transaction, return true
 			return true;
 		} else
 		{
+			// Unsuccessful transaction, return false
 			return false;
 		}
 	}
 
 	/**
-	 * Calculate interest (SEK)
+	 * Calculate interest (SEK). If balance is positive, give 0,5% interest.
+	 * Otherwise if balance is negative, collect 7% debt interest.
 	 * 
-	 * @return the interest as double
+	 * @return the interest
 	 */
 	public double calculateInterest()
 	{
 		double currentRate;
+		// Current balance is positive: 0,5% interest
 		if (getBalance() >= 0)
 		{
 			currentRate = rate;
-		} else
+		}
+		// Current balance is negative: 7% debt interest
+		else
 		{
 			currentRate = debtRate;
 		}
+		// Calculate interest and return it
 		double interest = getBalance() * currentRate / 100;
 		return interest;
 	}
@@ -85,10 +95,13 @@ public class CreditAccount extends Account
 	public String toStringWithRate()
 	{
 		double currentRate;
+		// Current balance is positive: 0,5% interest
 		if (getBalance() >= 0)
 		{
 			currentRate = rate;
-		} else
+		}
+		// Current balance is negative: 7% debt interest
+		else
 		{
 			currentRate = debtRate;
 		}

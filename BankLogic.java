@@ -7,12 +7,11 @@ import java.util.List;
  * Bank utility methods. Part of D0018D, assignment 2.
  * 
  * @author Viktor Lundberg, lunvik-8
- * @version 2.0 (2021-02-09)
+ * @version 2.0 (2021-03-09)
  */
 
 public class BankLogic
 {
-	// TODO: skapa ett UML diagram för projektet
 	/**
 	 * ArrayList of type Customer to keep track of customers. Customers are created
 	 * through createCustomer method and stored here.
@@ -81,15 +80,15 @@ public class BankLogic
 	public ArrayList<String> getAllCustomers()
 	{
 		// Create temporary list that we later return.
-		ArrayList<String> tmpCustomerArr = new ArrayList<String>();
+		ArrayList<String> tmpCustomerList = new ArrayList<String>();
 		// Loops through all elements in myCustomerArrayList (i.e, all customers).
-		for (Customer var : customerList)
+		for (Customer i : customerList)
 		{
 			// For every customer, use toString method and store in our temporary list.
-			tmpCustomerArr.add(var.toStringCustomer());
+			tmpCustomerList.add(i.toStringCustomer());
 		}
 		// Return the list.
-		return tmpCustomerArr;
+		return tmpCustomerList;
 	}
 
 	/**
@@ -103,24 +102,24 @@ public class BankLogic
 	public ArrayList<String> getCustomer(String pNo)
 	{
 		// Create a temporary list.
-		ArrayList<String> tmpCustomerArr = new ArrayList<String>();
+		ArrayList<String> tmpCustomerList = new ArrayList<String>();
 		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-		// If we did find the customer: do
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
 			// Use toString method on customer and add to our tmp list.
 			// Add information about customer on first slot.
-			tmpCustomerArr.add(tmpCustomer.toStringCustomer());
+			tmpCustomerList.add(tmpCustomer.toStringCustomer());
 			// Continue with information about the accounts on following slots.
 			// We must loop through the account list to fetch information about each slot
 			for (int i = 0; i < tmpCustomer.getAccountsList().size(); i++)
 			{
 				// Add to the list.
-				tmpCustomerArr.add(tmpCustomer.getAccountsList().get(i).toStringWithRate());
+				tmpCustomerList.add(tmpCustomer.getAccountsList().get(i).toStringWithRate());
 			}
 			// Return the list.
-			return tmpCustomerArr;
+			return tmpCustomerList;
 		} else
 		{
 			// If no customer is found, return null.
@@ -141,7 +140,7 @@ public class BankLogic
 	{
 		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-		// If we did find the customer: do
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
 			// Changes name of the person, as long as the name input was not empty.
@@ -164,9 +163,9 @@ public class BankLogic
 	}
 
 	/**
-	 * Creates a new instance of Account (i.e, creates an account for the person).
-	 * We are using pNo to find the correct person to create the account for. The
-	 * account is added to the customers own personal accountsArrayList.
+	 * Creates a new instance of SavingsAccount (i.e, creates an account for the
+	 * person). We are using pNo to find the correct person to create the account
+	 * for. The account is added to the customers accounts list.
 	 * 
 	 * @param pNo (Personal number)
 	 * @return AccountId of the new account that was created, or -1 if no account
@@ -176,12 +175,12 @@ public class BankLogic
 	{
 		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-		// If we did find the customer: do
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
-			// Create new instance of Account.
+			// Create new SavingsAccount
 			Account tmpAcc = new SavingsAccount();
-			// Add our freshly created account to customers own personal accountsArrayList.
+			// Add our freshly created account to customers account list.
 			tmpCustomer.getAccountsList().add(tmpAcc);
 			// Get account number for the newly created account and return it.
 			return (tmpAcc.getAccountId());
@@ -193,20 +192,30 @@ public class BankLogic
 	}
 
 	/**
-	 * @param pNo
-	 * @return
+	 * Create a new CreditAccount for the customer. We are using pNo as input to
+	 * find the correct person and then add the account to the customers account
+	 * list.
+	 * 
+	 * @param pNo (Personal number)
+	 * @return AccountId of the new account that was created, or -1 if no account
+	 *         was created.
 	 */
 	public int createCreditAccount(String pNo)
 	{
+		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
+			// Create new CreditAccount
 			Account tmpAcc = new CreditAccount();
+			// Add our freshly created account to customers account list.
 			tmpCustomer.getAccountsList().add(tmpAcc);
+			// Get account number for the newly created account and return it.
 			return (tmpAcc.getAccountId());
 		} else
 		{
+			// If we didn't find the customer and no account was created, return -1.
 			return -1;
 		}
 	}
@@ -253,7 +262,7 @@ public class BankLogic
 	 * @param pNo       (Personal number)
 	 * @param accountId (Account id we want to deposit into)
 	 * @param amount    (Amount to deposit)
-	 * @return True if successful, false if account not found.
+	 * @return True if successful, false if account not found or amount not > 0.
 	 */
 	public boolean deposit(String pNo, int accountId, double amount)
 	{
@@ -261,7 +270,7 @@ public class BankLogic
 		{
 			// Find the customer using findCustomer method.
 			Customer tmpCustomer = findCustomer(pNo);
-			// If we did find the customer: do
+			// If we did find the customer
 			if (tmpCustomer != null)
 			{
 				// Loop through all accounts in the array associated with the current person.
@@ -279,24 +288,24 @@ public class BankLogic
 				}
 			}
 		}
-		// If we didn't find it, return false
+		// If we didn't find it or amount was not > 0, return false.
 		return false;
 	}
 
 	/**
-	 * Makes a withdrawal from an account, if there is enough money on the account.
+	 * Attempts to make a withdrawal from an account.
 	 * 
 	 * @param pNo       (Personal number)
 	 * @param accountId (Account Id of the account to withdrawal from)
 	 * @param amount    (Amount to withdrawal)
-	 * @return True if successful, false if account not found or not enough money on
-	 *         the account.
+	 * @return True if successful, false if account not found or withdrawal
+	 *         conditions not met.
 	 */
 	public boolean withdraw(String pNo, int accountId, double amount)
 	{
 		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-		// If we did find the customer: do
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
 			// Loop through all accounts in the array associated with the current person.
@@ -307,18 +316,21 @@ public class BankLogic
 				if (currentAccountId == accountId)
 				{
 					// If it does, we found the correct account.
-					// Withdrawal from the account
+					// Attempt to withdrawal from the account. Withdrawal method returns true if it
+					// is successful. Therefore, our condition has to be to return true also if
+					// successful.
 					if (tmpCustomer.getAccountsList().get(i).withdrawal(amount))
 					{
 						return true;
 					} else
 					{
+						// Attempt failed, return false.
 						return false;
 					}
 				}
 			}
 		}
-		// If we didn't find it, return false.
+		// If we didn't find the customer or the account, return false.
 		return false;
 	}
 
@@ -334,7 +346,7 @@ public class BankLogic
 	{
 		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-		// If we did find the customer: do
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
 			// Loop through all accounts in the array associated with the current person.
@@ -369,7 +381,7 @@ public class BankLogic
 	public ArrayList<String> deleteCustomer(String pNo)
 	{
 		// Create temporary list that we later return.
-		ArrayList<String> tmpCustomerArr = new ArrayList<String>();
+		ArrayList<String> tmpCustomerList = new ArrayList<String>();
 		// Loop through all elements in myCustomerArrayList (i.e, check all customers).
 		// We have to do this manually because we need to find the correct index
 		// in order to be able to delete it later on.
@@ -382,14 +394,14 @@ public class BankLogic
 			{
 				// Now we have found the correct person.
 				// Add information about the customer to the list.
-				tmpCustomerArr.add(tmpCustomer.toStringCustomer());
+				tmpCustomerList.add(tmpCustomer.toStringCustomer());
 				// Loop through all the accounts.
 				// No incrementer on j since we delete the account each time in the loop,
 				// so index shiftes every time.
 				for (int j = 0; j < tmpCustomer.getAccountsList().size();)
 				{
 					// Add information about each account including interest to the list.
-					tmpCustomerArr.add(tmpCustomer.getAccountsList().get(j).toStringWithoutRate()
+					tmpCustomerList.add(tmpCustomer.getAccountsList().get(j).toStringWithoutRate()
 							+ tmpCustomer.getAccountsList().get(j).calculateInterest() + " kr");
 					// Remove the account.
 					tmpCustomer.getAccountsList().remove(j);
@@ -397,23 +409,27 @@ public class BankLogic
 				// Remove the customer.
 				customerList.remove(i);
 				// Return the information.
-				return tmpCustomerArr;
+				return tmpCustomerList;
 			}
 		}
 		// If nothing was done, return null.
 		return null;
 	}
 
+	/**
+	 * Gets a list of all transactions for a specific account
+	 * 
+	 * @param pNo       (Personal number)
+	 * @param accountId (of the account we want to find transactions for)
+	 * @return the list of transactions if successful, null if no transactions found
+	 */
 	public ArrayList<String> getTransactions(String pNo, int accountId)
 	{
-		// TODO: transaktioner finns lagrade i en lista men de måste lagras som
-		// transaktioner för JUSt den customern. eller kanske till och med just det
-		// accountet??
-
-		ArrayList<String> hej = new ArrayList<>();
+		// Create a list to copy over our current transactions into
+		ArrayList<String> transactions = new ArrayList<>();
 		// Find the customer using findCustomer method.
 		Customer tmpCustomer = findCustomer(pNo);
-		// If we did find the customer: do
+		// If we did find the customer
 		if (tmpCustomer != null)
 		{
 			// Loop through all accounts in the array associated with the current person.
@@ -424,16 +440,23 @@ public class BankLogic
 				if (currentAccountId == accountId)
 				{
 					// If it does, we found the correct account.
-					for (int j = 0; j < tmpCustomer.getAccountsList().get(i).transactionsList.size(); j++)
+					for (int j = 0; j < tmpCustomer.getAccountsList().get(i).getTransactionsList().size(); j++)
 					{
-						String hejsan = tmpCustomer.getAccountsList().get(i).transactionsList.get(j);
-						hej.add(hejsan);
+						// Get the transactions
+						String currentTransaction = tmpCustomer.getAccountsList().get(i).getTransactionsList().get(j);
+						transactions.add(currentTransaction);
 					}
-
+					// If there was any transaction history to get and we got it, return the list.
+					if (!transactions.isEmpty())
+					{
+						return transactions;
+					}
 				}
 			}
 		}
-		return hej;
+		// If we didn't find any customer or the account didn't have any transaction
+		// history, return null.
+		return null;
 	}
 
 }

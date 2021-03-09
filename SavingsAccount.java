@@ -8,16 +8,16 @@ import java.time.format.DateTimeFormatter;
  * Account. Part of D0018D, assignment 2.
  * 
  * @author Viktor Lundberg, lunvik-8
- * @version 2.0 (2021-mm-dd)
+ * @version 2.0 (2021-03-09)
  */
 
 public class SavingsAccount extends Account
 {
 	/**
-	 * Instance variables
+	 * Instance variables specific for SavingsAccounts
 	 */
-	private double rate;
 	private int availableFreeWithdrawals;
+	private double rate;
 	private double debtRate;
 
 	/**
@@ -26,55 +26,65 @@ public class SavingsAccount extends Account
 	public SavingsAccount()
 	{
 		super("Sparkonto");
-		rate = 1;
 		availableFreeWithdrawals = 1;
+		rate = 1;
 		debtRate = 2;
 	}
 
 	/**
-	 * Withdrawal from account
+	 * Withdrawal from account. Depending on if the account has available free
+	 * withdrawals the cost is calculated different.
 	 * 
-	 * @param amount to withdrawal as double
+	 * If it has free withdrawals available check that the amount to withdraw does
+	 * not exceed the balance and is positive.
+	 * 
+	 * If it does not have free withdrawals available, collect 2% interest from
+	 * withdrawn amount and check that the balance and interest does not exceed
+	 * current balance.
+	 * 
+	 * @param amount to withdrawal
 	 * @return true if successful, false if failed
 	 */
 	public boolean withdrawal(double amount)
 	{
 		double withdrawalInterest = amount * debtRate / 100;
 		double currentBalance = getBalance();
-				
+
+		// Free withdrawal available & amount does not exceed current balance.
 		if (currentBalance >= amount && amount >= 0 && availableFreeWithdrawals > 0)
 		{
-			setBalance (currentBalance -= amount);
+			// Set new balance and update condition
+			setBalance(currentBalance -= amount);
 			availableFreeWithdrawals--;
-			
-			LocalDateTime currentTime = LocalDateTime.now();
-			DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String formatedTime = currentTime.format(prefFormat);
-			transactionsList.add(formatedTime + " -" + amount + " kr " + "Saldo: " + getBalance() + " kr");
-			
-			
-			
-			
-			return true;
-		} 
-		else if (currentBalance - withdrawalInterest >= amount && amount >= 0 && availableFreeWithdrawals <= 0)
-		{
-			setBalance (currentBalance -= (amount + withdrawalInterest));
-			
-			
-			LocalDateTime currentTime = LocalDateTime.now();
-			DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String formatedTime = currentTime.format(prefFormat);
-			transactionsList.add(formatedTime + " -" + amount + " kr " + "Saldo: " + getBalance() + " kr");
-			
-			
-			
-			
-			
-			
+
+			// Create timestamp for the transaction
+			LocalDateTime currentTime = LocalDateTime.now(); // Get the current time
+			DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // Define our format
+			String formatedTime = currentTime.format(prefFormat); // Format it
+			getTransactionsList().add(formatedTime + " -" + amount + " kr " + "Saldo: " + getBalance() + " kr");
+
+			// Successful transaction, return true
 			return true;
 		}
-		else {
+		// No free withdrawals available, amount does not exceed current balance +
+		// interest for the transaction.
+		else if (currentBalance - withdrawalInterest >= amount && amount >= 0 && availableFreeWithdrawals <= 0)
+		{
+			// Set new balance
+			setBalance(currentBalance -= (amount + withdrawalInterest));
+
+			// Create timestamp for the transaction
+			LocalDateTime currentTime = LocalDateTime.now(); // Get the current time
+			DateTimeFormatter prefFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // Define our format
+			String formatedTime = currentTime.format(prefFormat); // Format it
+			getTransactionsList().add(
+					formatedTime + " -" + (amount + withdrawalInterest) + " kr " + "Saldo: " + getBalance() + " kr");
+
+			// Successful transaction, return true
+			return true;
+		} else
+		{
+			// Unsuccessful transaction, return false
 			return false;
 		}
 	}
@@ -82,7 +92,7 @@ public class SavingsAccount extends Account
 	/**
 	 * Calculate interest (SEK)
 	 * 
-	 * @return the interest as double
+	 * @return the interest
 	 */
 	public double calculateInterest()
 	{
@@ -90,7 +100,6 @@ public class SavingsAccount extends Account
 		return interest;
 	}
 
-	
 	/**
 	 * A toString representation of the account including rate as %.
 	 * 
