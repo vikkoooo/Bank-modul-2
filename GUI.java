@@ -1,32 +1,34 @@
 package lunvik8;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-
+import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.event.*;
+import java.util.*;
 
 /**
  * Basic GUI class that implements interface for bank. Part of D0018D,
  * assignment 3.
  * 
  * @author Viktor Lundberg, lunvik-8
- * @version 1.0 (2021-04-13)
+ * @version 1.1 (2021-04-13)
  */
 
 public class GUI extends JFrame
 {
-	// To create an instance of BankLogic
-	BankLogic bank;
-
-	// Main method to start the GUI
+	/**
+	 * Main method to start the GUI
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args)
 	{
 		// Driver code
 		JFrame frame = new GUI();
 	}
+
+	// To reach an instance of BankLogic. Initialized in constructor.
+	BankLogic bank;
 
 	// Window settings
 	private static final int HEIGHT = 400;
@@ -34,35 +36,42 @@ public class GUI extends JFrame
 	private static final int CENTER_WIDTH = 240;
 	private static final int EAST_WIDTH = 240;
 
-	// To be reached by listener
+	// Panels
 	JPanel northPanel, westPanel, centerPanel, eastPanel, southPanel;
+
+	// Components in north panel
 	JLabel currentPage;
-	JButton home, createCust, deleteCust, listCust, changeCustName, createSavingsAcc, createCreditAcc, findAccount,
-			deposit, withdrawal, closeAcc, viewTransactions, viewCustomerAccounts;
+
+	// Components in west panel
+	JButton home, viewCustomers, createCustomer, deleteCustomer, changeCustomerName, createSavingsAccount,
+			createCreditAccount, viewCustomerAccounts, findAccount, deposit, withdrawal, closeAccount, viewTransactions;
+
+	// Components in center panel
 	JTextField field1, field2, field3;
-	JList displayList;
 	TitledBorder field1border, field2border, field3border;
+	JButton okCreateCustomer, okDeleteCustomer, okChangeCustomerName, okCreateSavingsAccount, okCreateCreditAccount,
+			okViewCustomerAccounts, okFindAccount, okDeposit, okWithdrawal, okCloseAccount, okViewTransactions;
 
-	JButton okCreateCust, okDeleteCust, okChangeCustName, okCreateSavings, okCreateCredit, okFindAccount, okDeposit,
-			okWithdrawal, okCloseAcc, okViewTransactions, okViewCustomerAccounts;
+	// Components in east panel
+	JList displayList;
 
-	// Constructor
+	/**
+	 * Constructor
+	 */
 	public GUI()
 	{
-		bank = new BankLogic();
+		bank = new BankLogic(); // Initialize a new instance of BankLogic
+		this.setLayout(new BorderLayout()); // Use BorderLayout
 
-		// för test. tas bort sen.
-		bank.createCustomer("Henrik", "Rydstrom", "870101-0101");
-		bank.createCreditAccount("870101-0101");
-		bank.createSavingsAccount("870101-0101");
-
-		this.setLayout(new BorderLayout());
+		// Build panels
 		buildMenu();
 		buildNorth();
 		buildWest();
 		buildCenter();
 		buildEast();
 		buildSouth();
+
+		// Frame settings
 		this.setTitle("Bank");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
@@ -72,13 +81,14 @@ public class GUI extends JFrame
 	}
 
 	/**
-	 * Menu for file handling
+	 * Menu for file handling to be implemented in next version of program.
 	 */
 	private void buildMenu()
 	{
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
+		// File menu
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		JMenu importMenu = new JMenu("Import ...");
@@ -86,8 +96,11 @@ public class GUI extends JFrame
 		JMenu exportMenu = new JMenu("Export ...");
 		fileMenu.add(exportMenu);
 
+		// Import sub menu
 		JMenuItem customerImport = new JMenuItem("Customer with accounts");
 		importMenu.add(customerImport);
+
+		// Export sub menu
 		JMenuItem customerExport = new JMenuItem("Customer with accounts");
 		exportMenu.add(customerExport);
 		JMenuItem transactionItem = new JMenuItem("Transactions for account");
@@ -95,170 +108,171 @@ public class GUI extends JFrame
 	}
 
 	/**
-	 * Top center, display current page
+	 * North center panel, display current page
 	 */
 	private void buildNorth()
 	{
 		northPanel = new JPanel();
 		this.add(northPanel, BorderLayout.NORTH);
 
-		currentPage = new JLabel("Home");
+		// Displays current page
+		currentPage = new JLabel("Home"); // Start at page "Home".
 		northPanel.add(currentPage);
 		northPanel.setVisible(true);
 	}
 
 	/**
-	 * West. Menu with buttons, all our functions.
+	 * West panel. Menu with buttons, all our functions.
 	 */
 	private void buildWest()
 	{
 		westPanel = new JPanel();
-		westPanel.setLayout(new GridLayout(14, 1));
+		westPanel.setLayout(new GridLayout(14, 1)); // GridLayout inside this panel to keep buttons aligned.
 		westPanel.setPreferredSize(new Dimension(WEST_WIDTH, HEIGHT));
 		this.add(westPanel, BorderLayout.WEST);
 
-		MenuListener al = new MenuListener(); // ActionListener
+		// ActionListener for menu
+		MenuListener menuListener = new MenuListener();
 
 		// Buttons
 		home = new JButton("Home");
 		westPanel.add(home);
-		home.addActionListener(al);
+		home.addActionListener(menuListener);
 
-		listCust = new JButton("View all existing customers");
-		westPanel.add(listCust);
-		listCust.addActionListener(al);
+		viewCustomers = new JButton("View all existing customers");
+		westPanel.add(viewCustomers);
+		viewCustomers.addActionListener(menuListener);
 
-		createCust = new JButton("Create new customer");
-		westPanel.add(createCust);
-		createCust.addActionListener(al);
+		createCustomer = new JButton("Create new customer");
+		westPanel.add(createCustomer);
+		createCustomer.addActionListener(menuListener);
 
-		deleteCust = new JButton("Delete an existing customer");
-		westPanel.add(deleteCust);
-		deleteCust.addActionListener(al);
+		deleteCustomer = new JButton("Delete an existing customer");
+		westPanel.add(deleteCustomer);
+		deleteCustomer.addActionListener(menuListener);
 
-		JLabel handleCust = new JLabel("             Handle customers");
+		JLabel handleCust = new JLabel("                Handle customers");
 		westPanel.add(handleCust);
 
-		changeCustName = new JButton("Change customer name");
-		westPanel.add(changeCustName);
-		changeCustName.addActionListener(al);
+		changeCustomerName = new JButton("Change customer name");
+		westPanel.add(changeCustomerName);
+		changeCustomerName.addActionListener(menuListener);
 
-		createSavingsAcc = new JButton("Create savings account");
-		westPanel.add(createSavingsAcc);
-		createSavingsAcc.addActionListener(al);
+		createSavingsAccount = new JButton("Create savings account");
+		westPanel.add(createSavingsAccount);
+		createSavingsAccount.addActionListener(menuListener);
 
-		createCreditAcc = new JButton("Create credit account");
-		westPanel.add(createCreditAcc);
-		createCreditAcc.addActionListener(al);
+		createCreditAccount = new JButton("Create credit account");
+		westPanel.add(createCreditAccount);
+		createCreditAccount.addActionListener(menuListener);
 
 		viewCustomerAccounts = new JButton("View customer accounts");
 		westPanel.add(viewCustomerAccounts);
-		viewCustomerAccounts.addActionListener(al);
+		viewCustomerAccounts.addActionListener(menuListener);
 
 		findAccount = new JButton("Find account");
 		westPanel.add(findAccount);
-		findAccount.addActionListener(al);
+		findAccount.addActionListener(menuListener);
 
 		deposit = new JButton("Deposit");
 		westPanel.add(deposit);
-		deposit.addActionListener(al);
+		deposit.addActionListener(menuListener);
 
 		withdrawal = new JButton("Withdrawal");
 		westPanel.add(withdrawal);
-		withdrawal.addActionListener(al);
+		withdrawal.addActionListener(menuListener);
 
-		closeAcc = new JButton("Close account");
-		westPanel.add(closeAcc);
-		closeAcc.addActionListener(al);
+		closeAccount = new JButton("Close account");
+		westPanel.add(closeAccount);
+		closeAccount.addActionListener(menuListener);
 
 		viewTransactions = new JButton("View transactions");
 		westPanel.add(viewTransactions);
-		viewTransactions.addActionListener(al);
+		viewTransactions.addActionListener(menuListener);
 
 		westPanel.setVisible(true);
 	}
 
+	/**
+	 * Center panel. Handles input and "OK" buttons.
+	 */
 	private void buildCenter()
 	{
 		centerPanel = new JPanel();
 		centerPanel.setPreferredSize(new Dimension(CENTER_WIDTH, HEIGHT));
 		this.add(centerPanel, BorderLayout.CENTER);
 
-		// Fields, will be used for all functions and manipulated each time.
+		// Fields, will be used to handle input for all functions and will be
+		// manipulated each time.
 		field1 = new JTextField(14);
-		field1border = BorderFactory.createTitledBorder("field1:");
-		field1.setBorder(field1border);
 		centerPanel.add(field1);
 		field1.setVisible(false);
 
 		field2 = new JTextField(14);
-		field2border = BorderFactory.createTitledBorder("field2:");
-		field2.setBorder(field2border);
 		centerPanel.add(field2);
 		field2.setVisible(false);
 
 		field3 = new JTextField(14);
-		field3border = BorderFactory.createTitledBorder("field3:");
-		field3.setBorder(field3border);
 		centerPanel.add(field3);
 		field3.setVisible(false);
 
-		OkListener al = new OkListener(); // ActionListener
+		// ActionListener for "OK" buttons
+		OkListener okListener = new OkListener();
 
-		// OK buttons need to be different depending on which function we are using
-		// because it will call to different logic functions.
-		okCreateCust = new JButton("okCreateCust");
-		okCreateCust.addActionListener(al);
-		centerPanel.add(okCreateCust);
-		okCreateCust.setVisible(false);
+		// "OK" buttons need to be different depending on which function we are using
+		// because it will call different functions within BankLogic class.
+		okCreateCustomer = new JButton("OK");
+		okCreateCustomer.addActionListener(okListener);
+		centerPanel.add(okCreateCustomer);
+		okCreateCustomer.setVisible(false);
 
-		okDeleteCust = new JButton("okDeleteCust");
-		okDeleteCust.addActionListener(al);
-		centerPanel.add(okDeleteCust);
-		okDeleteCust.setVisible(false);
+		okDeleteCustomer = new JButton("OK");
+		okDeleteCustomer.addActionListener(okListener);
+		centerPanel.add(okDeleteCustomer);
+		okDeleteCustomer.setVisible(false);
 
-		okChangeCustName = new JButton("okChangeCustName");
-		okChangeCustName.addActionListener(al);
-		centerPanel.add(okChangeCustName);
-		okChangeCustName.setVisible(false);
+		okChangeCustomerName = new JButton("OK");
+		okChangeCustomerName.addActionListener(okListener);
+		centerPanel.add(okChangeCustomerName);
+		okChangeCustomerName.setVisible(false);
 
-		okCreateSavings = new JButton("okCreateSavings");
-		okCreateSavings.addActionListener(al);
-		centerPanel.add(okCreateSavings);
-		okCreateSavings.setVisible(false);
+		okCreateSavingsAccount = new JButton("OK");
+		okCreateSavingsAccount.addActionListener(okListener);
+		centerPanel.add(okCreateSavingsAccount);
+		okCreateSavingsAccount.setVisible(false);
 
-		okCreateCredit = new JButton("okCreateCredit");
-		okCreateCredit.addActionListener(al);
-		centerPanel.add(okCreateCredit);
-		okCreateCredit.setVisible(false);
+		okCreateCreditAccount = new JButton("OK");
+		okCreateCreditAccount.addActionListener(okListener);
+		centerPanel.add(okCreateCreditAccount);
+		okCreateCreditAccount.setVisible(false);
 
-		okViewCustomerAccounts = new JButton("okViewCustomerAccounts");
-		okViewCustomerAccounts.addActionListener(al);
+		okViewCustomerAccounts = new JButton("OK");
+		okViewCustomerAccounts.addActionListener(okListener);
 		centerPanel.add(okViewCustomerAccounts);
 		okViewCustomerAccounts.setVisible(false);
 
-		okFindAccount = new JButton("okFindAccount");
-		okFindAccount.addActionListener(al);
+		okFindAccount = new JButton("OK");
+		okFindAccount.addActionListener(okListener);
 		centerPanel.add(okFindAccount);
 		okFindAccount.setVisible(false);
 
-		okDeposit = new JButton("okDeposit");
-		okDeposit.addActionListener(al);
+		okDeposit = new JButton("OK");
+		okDeposit.addActionListener(okListener);
 		centerPanel.add(okDeposit);
 		okDeposit.setVisible(false);
 
-		okWithdrawal = new JButton("okWithdrawal");
-		okWithdrawal.addActionListener(al);
+		okWithdrawal = new JButton("OK");
+		okWithdrawal.addActionListener(okListener);
 		centerPanel.add(okWithdrawal);
 		okWithdrawal.setVisible(false);
 
-		okCloseAcc = new JButton("okCloseAcc");
-		okCloseAcc.addActionListener(al);
-		centerPanel.add(okCloseAcc);
-		okCloseAcc.setVisible(false);
+		okCloseAccount = new JButton("OK");
+		okCloseAccount.addActionListener(okListener);
+		centerPanel.add(okCloseAccount);
+		okCloseAccount.setVisible(false);
 
-		okViewTransactions = new JButton("okViewTransactions");
-		okViewTransactions.addActionListener(al);
+		okViewTransactions = new JButton("OK");
+		okViewTransactions.addActionListener(okListener);
 		centerPanel.add(okViewTransactions);
 		okViewTransactions.setVisible(false);
 
@@ -266,7 +280,9 @@ public class GUI extends JFrame
 	}
 
 	/**
-	 * Shows banks current customers
+	 * East panel. Shows relevant current information about customers, accounts and
+	 * transactions. Information field changes depending on which state in the
+	 * program user currently is.
 	 */
 	private void buildEast()
 	{
@@ -274,9 +290,13 @@ public class GUI extends JFrame
 		eastPanel.setPreferredSize(new Dimension(EAST_WIDTH, HEIGHT));
 		this.add(eastPanel, BorderLayout.EAST);
 
+		// We display information in JList. When we start the program default is a list
+		// of the bank's current customers.
 		displayList = new JList();
 		displayList.setListData(bank.getAllCustomers().toArray());
 		displayList.setBorder(BorderFactory.createTitledBorder("Customers"));
+
+		// Scroll is needed because list can grow large.
 		JScrollPane custScroll = new JScrollPane(displayList);
 		custScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		custScroll.setVisible(true);
@@ -287,7 +307,7 @@ public class GUI extends JFrame
 	}
 
 	/**
-	 * Shows program version
+	 * South panel. Shows program name, version and author.
 	 */
 	private void buildSouth()
 	{
@@ -299,43 +319,63 @@ public class GUI extends JFrame
 		southPanel.setVisible(true);
 	}
 
+	/**
+	 * Since we are reusing the center panel for user input interactions we have to
+	 * make sure we only display the components we need for the current page. So by
+	 * default, we want to reset so everything is hidden each time we start to call
+	 * a button function.
+	 */
 	private void hideFields()
 	{
 		field1.setVisible(false);
 		field2.setVisible(false);
 		field3.setVisible(false);
-		okCreateCust.setVisible(false);
-		okDeleteCust.setVisible(false);
-		okChangeCustName.setVisible(false);
-		okCreateSavings.setVisible(false);
-		okCreateCredit.setVisible(false);
+		okCreateCustomer.setVisible(false);
+		okDeleteCustomer.setVisible(false);
+		okChangeCustomerName.setVisible(false);
+		okCreateSavingsAccount.setVisible(false);
+		okCreateCreditAccount.setVisible(false);
 		okViewCustomerAccounts.setVisible(false);
 		okFindAccount.setVisible(false);
 		okDeposit.setVisible(false);
 		okWithdrawal.setVisible(false);
-		okCloseAcc.setVisible(false);
+		okCloseAccount.setVisible(false);
 		okViewTransactions.setVisible(false);
 	}
 
-	// inbyggd lyssnarklass
+	/**
+	 * Nested ActionListener class. This class listens to the buttons in our menu,
+	 * west panel. Each action will perform changes to the center panel, getting the
+	 * center panel ready to handle next user input properly.
+	 */
 	public class MenuListener implements ActionListener
 	{
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
+			// Get text from button clicked. Use this information to find out which button
+			// user clicked on.
 			String buttonText = e.getActionCommand();
 
+			// Clicked "Home" or "View all existing customers" button
 			if (buttonText.equals("Home") || buttonText.equals("View all existing customers"))
 			{
+				// Change current page information
 				currentPage.setText(buttonText);
+				// By default we want to hide all fields and bring out only what we need
 				hideFields();
+
+				// By default we want to show current customers in the bank.
 				displayList.setListData(bank.getAllCustomers().toArray());
 				displayList.setBorder(BorderFactory.createTitledBorder("Customers"));
 			}
+			// Clicked "Create new customer" button
 			else if (buttonText.equals("Create new customer"))
 			{
 				currentPage.setText(buttonText);
 				hideFields();
+
+				// Manipulate fields so the user knows what to fill in
 				field1.setBorder(BorderFactory.createTitledBorder("Name"));
 				field1.setVisible(true);
 				field2.setBorder(BorderFactory.createTitledBorder("Surname"));
@@ -343,17 +383,21 @@ public class GUI extends JFrame
 				field3.setBorder(BorderFactory.createTitledBorder("Personal number"));
 				field3.setVisible(true);
 
-				okCreateCust.setVisible(true);
+				// Bring out "OK" button linked to the specific function we are performing, in
+				// this case the click of "OK" from user means we should call the createCustomer
+				// method in BankLogic.
+				okCreateCustomer.setVisible(true);
 			}
+			// Clicked "Delete an existing customer" button
 			else if (buttonText.equals("Delete an existing customer"))
 			{
 				currentPage.setText(buttonText);
 				hideFields();
 				field1.setBorder(BorderFactory.createTitledBorder("Personal number"));
 				field1.setVisible(true);
-
-				okDeleteCust.setVisible(true);
+				okDeleteCustomer.setVisible(true);
 			}
+			// Clicked "Change customer name" button
 			else if (buttonText.equals("Change customer name"))
 			{
 				currentPage.setText(buttonText);
@@ -364,24 +408,27 @@ public class GUI extends JFrame
 				field2.setVisible(true);
 				field3.setBorder(BorderFactory.createTitledBorder("Personal number"));
 				field3.setVisible(true);
-				okChangeCustName.setVisible(true);
+				okChangeCustomerName.setVisible(true);
 			}
+			// Clicked "Create savings account" button
 			else if (buttonText.equals("Create savings account"))
 			{
 				currentPage.setText(buttonText);
 				hideFields();
 				field1.setBorder(BorderFactory.createTitledBorder("Personal number"));
 				field1.setVisible(true);
-				okCreateSavings.setVisible(true);
+				okCreateSavingsAccount.setVisible(true);
 			}
+			// Clicked "Create credit account" button
 			else if (buttonText.equals("Create credit account"))
 			{
 				currentPage.setText(buttonText);
 				hideFields();
 				field1.setBorder(BorderFactory.createTitledBorder("Personal number"));
 				field1.setVisible(true);
-				okCreateCredit.setVisible(true);
+				okCreateCreditAccount.setVisible(true);
 			}
+			// Clicked "View customer accounts" button
 			else if (buttonText.equals("View customer accounts"))
 			{
 				currentPage.setText(buttonText);
@@ -390,6 +437,7 @@ public class GUI extends JFrame
 				field1.setVisible(true);
 				okViewCustomerAccounts.setVisible(true);
 			}
+			// Clicked "Find account" button
 			else if (buttonText.equals("Find account"))
 			{
 				currentPage.setText(buttonText);
@@ -400,6 +448,7 @@ public class GUI extends JFrame
 				field2.setVisible(true);
 				okFindAccount.setVisible(true);
 			}
+			// Clicked "Deposit" button
 			else if (buttonText.equals("Deposit"))
 			{
 				currentPage.setText(buttonText);
@@ -412,6 +461,7 @@ public class GUI extends JFrame
 				field3.setVisible(true);
 				okDeposit.setVisible(true);
 			}
+			// Clicked "Withdrawal" button
 			else if (buttonText.equals("Withdrawal"))
 			{
 				currentPage.setText(buttonText);
@@ -424,6 +474,7 @@ public class GUI extends JFrame
 				field3.setVisible(true);
 				okWithdrawal.setVisible(true);
 			}
+			// Clicked "Close account" button
 			else if (buttonText.equals("Close account"))
 			{
 				currentPage.setText(buttonText);
@@ -432,8 +483,9 @@ public class GUI extends JFrame
 				field1.setVisible(true);
 				field2.setBorder(BorderFactory.createTitledBorder("Account number"));
 				field2.setVisible(true);
-				okCloseAcc.setVisible(true);
+				okCloseAccount.setVisible(true);
 			}
+			// Clicked "View transactions" button
 			else if (buttonText.equals("View transactions"))
 			{
 				currentPage.setText(buttonText);
@@ -444,74 +496,105 @@ public class GUI extends JFrame
 				field2.setVisible(true);
 				okViewTransactions.setVisible(true);
 			}
-
 		}
-
 	}
 
+	/**
+	 * Nested ActionListener class. This class listens to the "OK" buttons and
+	 * accepts information from field1, field2 and field3 and calls the appropriate
+	 * function in BankLogic class.
+	 */
 	public class OkListener implements ActionListener
 	{
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			if (e.getSource().equals(okCreateCust))
+			// Create new customer
+			if (e.getSource().equals(okCreateCustomer))
 			{
+				// createCustomer returns boolean, true or false, if successful or not. Store in
+				// variable to know if it was successful or not
 				boolean action = bank.createCustomer(field1.getText(), field2.getText(), field3.getText());
+
+				// Display changes
 				displayList.setListData(bank.getAllCustomers().toArray());
-				field1.setText("");
-				field2.setText("");
-				field3.setText("");
+
+				// Sets the text in field1, field2 and field3 to ""
+				resetTextFields();
+
+				// Popup message that displays if the action was a success or not.
 				confirmBoolean(action);
 			}
-			else if (e.getSource().equals(okDeleteCust))
+			// Delete customer
+			else if (e.getSource().equals(okDeleteCustomer))
 			{
+				// deleteCustomer returns an ArrayList with information about the deleted
+				// customer. Store this information.
 				ArrayList<String> action = bank.deleteCustomer(field1.getText());
-				displayList.setListData(bank.getAllCustomers().toArray());
-				field1.setText("");
 
-				JList confirm = new JList();
-				confirm.setListData(action.toArray());
-				JOptionPane.showMessageDialog(rootPane, confirm);
+				// But if no customer was found action will contain null, if this is the case,
+				// customer was not found
+				if (action == null)
+				{
+					JOptionPane.showMessageDialog(rootPane, "Customer was not found");
+				}
+				// If we got something back, continue as normal.
+				else
+				{
+					displayList.setListData(bank.getAllCustomers().toArray());
+					resetTextFields();
+
+					// Show information about the deleted customer
+					JList confirm = new JList();
+					confirm.setListData(action.toArray());
+					JOptionPane.showMessageDialog(rootPane, confirm);
+				}
 			}
-			else if (e.getSource().equals(okChangeCustName))
+			// Change customer name
+			else if (e.getSource().equals(okChangeCustomerName))
 			{
 				boolean action = bank.changeCustomerName(field1.getText(), field2.getText(), field3.getText());
 				displayList.setListData(bank.getAllCustomers().toArray());
-				field1.setText("");
-				field2.setText("");
-				field3.setText("");
+				resetTextFields();
 				confirmBoolean(action);
 			}
-			else if (e.getSource().equals(okCreateSavings))
+			// Create savings account
+			else if (e.getSource().equals(okCreateSavingsAccount))
 			{
+				// Creating accounts is a little different because it will return an int value
+				// instead of boolean.
 				int action = bank.createSavingsAccount(field1.getText());
 				displayList.setListData(bank.getCustomer(field1.getText()).toArray());
 				displayList.setBorder(BorderFactory.createTitledBorder("Customer info"));
-				field1.setText("");
+				resetTextFields();
 				confirmAccount(action);
-
 			}
-			else if (e.getSource().equals(okCreateCredit))
+			// Create credit account
+			else if (e.getSource().equals(okCreateCreditAccount))
 			{
 				int action = bank.createCreditAccount(field1.getText());
 				displayList.setListData(bank.getCustomer(field1.getText()).toArray());
 				displayList.setBorder(BorderFactory.createTitledBorder("Customer info"));
-				field1.setText("");
+				resetTextFields();
 				confirmAccount(action);
 			}
+			// View customer accounts
 			else if (e.getSource().equals(okViewCustomerAccounts))
 			{
+				// If this is true, we didn't find the customer.
 				if (bank.getCustomer(field1.getText()) == null)
 				{
 					JOptionPane.showMessageDialog(rootPane, "No customer was found");
 				}
+				// We found the customer, continue.
 				else
 				{
 					displayList.setListData(bank.getCustomer(field1.getText()).toArray());
 					displayList.setBorder(BorderFactory.createTitledBorder("Customer info"));
-					field1.setText("");
+					resetTextFields();
 				}
 			}
+			// Find account
 			else if (e.getSource().equals(okFindAccount))
 			{
 				if (bank.getAccount(field1.getText(), Integer.valueOf(field2.getText())) == null)
@@ -524,10 +607,10 @@ public class GUI extends JFrame
 					String[] arr = { info };
 					displayList.setListData(arr);
 					displayList.setBorder(BorderFactory.createTitledBorder("Account information"));
-					field1.setText("");
-					field2.setText("");
+					resetTextFields();
 				}
 			}
+			// Deposit
 			else if (e.getSource().equals(okDeposit))
 			{
 				String pNo = field1.getText();
@@ -536,11 +619,10 @@ public class GUI extends JFrame
 				boolean action = bank.deposit(pNo, accountId, amount);
 				displayList.setListData(bank.getCustomer(field1.getText()).toArray());
 				displayList.setBorder(BorderFactory.createTitledBorder("Customer info"));
-				field1.setText("");
-				field2.setText("");
-				field3.setText("");
+				resetTextFields();
 				confirmBoolean(action);
 			}
+			// Withdrawal
 			else if (e.getSource().equals(okWithdrawal))
 			{
 				String pNo = field1.getText();
@@ -549,25 +631,25 @@ public class GUI extends JFrame
 				boolean action = bank.withdraw(pNo, accountId, amount);
 				displayList.setListData(bank.getCustomer(field1.getText()).toArray());
 				displayList.setBorder(BorderFactory.createTitledBorder("Customer info"));
-				field1.setText("");
-				field2.setText("");
-				field3.setText("");
+				resetTextFields();
 				confirmBoolean(action);
 			}
-			else if (e.getSource().equals(okCloseAcc))
+			// Close account
+			else if (e.getSource().equals(okCloseAccount))
 			{
 				String pNo = field1.getText();
 				int accountId = Integer.valueOf(field2.getText());
+				// In this case we get a String back from closeAccount method
 				String action = bank.closeAccount(pNo, accountId);
 				displayList.setListData(bank.getCustomer(field1.getText()).toArray());
 				displayList.setBorder(BorderFactory.createTitledBorder("Customer info"));
-				field1.setText("");
-				field2.setText("");
+				resetTextFields();
+				// Show string
 				JOptionPane.showMessageDialog(rootPane, action);
 			}
+			// View transactions
 			else if (e.getSource().equals(okViewTransactions))
 			{
-
 				String pNo = field1.getText();
 				int accountId = Integer.valueOf(field2.getText());
 
@@ -579,20 +661,23 @@ public class GUI extends JFrame
 				{
 					displayList.setListData(bank.getTransactions(pNo, accountId).toArray());
 					displayList.setBorder(BorderFactory.createTitledBorder("Account transactions"));
-					field1.setText("");
-					field2.setText("");
+					resetTextFields();
 				}
 			}
 		}
-
 	}
 
+	/**
+	 * Shows an JOptionPane message with information if the action from the user was
+	 * successful or not.
+	 * 
+	 * @param action, true = successful, false = unsuccessful.
+	 */
 	private void confirmBoolean(boolean action)
 	{
-
 		if (action == true)
 		{
-			JOptionPane.showMessageDialog(rootPane, "Ok");
+			JOptionPane.showMessageDialog(rootPane, "OK");
 		}
 		else if (action == false)
 		{
@@ -600,6 +685,12 @@ public class GUI extends JFrame
 		}
 	}
 
+	/**
+	 * Shows an JOptionPane message with information about newly created account.
+	 * 
+	 * @param action, account number from user action if successful, otherwise -1 =
+	 *                something was wrong.
+	 */
 	private void confirmAccount(int action)
 	{
 		if (action == -1)
@@ -608,8 +699,18 @@ public class GUI extends JFrame
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(rootPane, "Ok, account number: " + action);
+			JOptionPane.showMessageDialog(rootPane, "OK, account number: " + action);
 		}
+	}
+
+	/**
+	 * Resets the textFields in center panel.
+	 */
+	private void resetTextFields()
+	{
+		field1.setText("");
+		field2.setText("");
+		field3.setText("");
 	}
 
 }
